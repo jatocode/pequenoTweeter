@@ -32,6 +32,6 @@ s=""
 test = (0x2581..0x2589).to_a
 s = test.pack("U*")
 puts s
-Twitter.update("Unicode? #{s}")
+#Twitter.update("Unicode? #{s}")
 
 puts Twitter.rate_limit_status.remaining_hits.to_s + " Twitter API request(s) remaining this hour"
