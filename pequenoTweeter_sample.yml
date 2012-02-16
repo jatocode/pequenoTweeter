@@ -4,3 +4,4 @@
 :token: OATH_TOKEN 
 :secret: OATH_SECRET 
 :since_id: 169543536792965121
+:base_path: /var/cache/pequenoTweeter/

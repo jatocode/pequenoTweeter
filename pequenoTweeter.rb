@@ -10,13 +10,14 @@ require './server.rb'
 gem 'twitter','2.1.0'
 require "twitter"
 
-# Config for twitter gem
-my_config = YAML.load_file('pequenoTweeter.yml')
+# Load config
+@my_config = YAML.load_file('pequenoTweeter.yml')
+
 Twitter.configure do |config|
-  config.consumer_key = my_config[:consumer_key]
-  config.consumer_secret = my_config[:consumer_secret]
-  config.oauth_token = my_config[:token]
-  config.oauth_token_secret = my_config[:secret]
+  config.consumer_key = @my_config[:consumer_key]
+  config.consumer_secret = @my_config[:consumer_secret]
+  config.oauth_token = @my_config[:token]
+  config.oauth_token_secret = @my_config[:secret]
 end
 
 def check_ip_change
@@ -30,12 +31,13 @@ end
 def hourly_update
    server = Server::Status.new
 
-   last_tweet = File.open('/var/cache/twitterbot/last_tweet') {|f| f.readline}
+   base_path = @my_config[:base_path]
+   last_tweet = File.open("#{base_path}/last_tweet") {|f| f.readline}
    last_update = Time.at(last_tweet.to_i)
 
    now = Time.new
    if now-last_update > 3600 
-       File.open('/var/cache/twitterbot/last_tweet','w') {|f| f.puts now.to_i}
+       File.open("#{base_path}/last_tweet",'w') {|f| f.puts now.to_i}
        fortune = %x[fortune].to_s[0..138]
        combo = server.get_combined
        puts "Hourly update"

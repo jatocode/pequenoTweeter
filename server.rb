@@ -33,10 +33,10 @@ module Server
 
     def check_ip
         current = get_address.to_s
-        filed = File.open('/var/cache/twitterbot/ip') {|f| f.readline}
+        filed = File.open('/var/cache/pequenoTweeter/ip') {|f| f.readline}
         filed.chomp!
         if !current.eql? filed 
-            File.open('/var/cache/twitterbot/ip','w') {|f| f.puts current}
+            File.open('/var/cache/pequenoTweeter/ip','w') {|f| f.puts current}
             return "IP has changed! Old #{filed} new #{current}"
         end
         return "No IP change"
