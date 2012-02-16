@@ -4,5 +4,8 @@ require './server.rb'
 server = Server::Status.new
 server.test
 
-t = Time.new
-puts t
+last_tweet = File.open('/var/cache/twitterbot/last_tweet') {|f| f.readline}
+
+puts "Last update-tweet: #{Time.at(last_tweet.to_i)}"
+
+

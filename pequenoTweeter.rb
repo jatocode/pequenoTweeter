@@ -10,9 +10,6 @@ require './server.rb'
 gem 'twitter','2.1.0'
 require "twitter"
 
-@last_update = Time.now
-
-
 my_config = YAML.load_file('pequenoTweeter.yml')
 puts my_config.inspect
 
@@ -33,10 +30,13 @@ end
 
 def hourly_update
    server = Server::Status.new
+
+   last_tweet = File.open('/var/cache/twitterbot/last_tweet') {|f| f.readline}
+   last_update = Time.at(last_tweet.to_i)
+
    now = Time.new
-   start = @last_update
-   if now-start > 3600 
-       @last_update = Time.now
+   if now-last_update > 3600 
+       File.open('/var/cache/twitterbot/last_tweet','w') {|f| f.puts now.to_i}
        fortune = %x[fortune].to_s[0..138]
        combo = server.get_combined
        puts "Hourly update"
@@ -44,8 +44,7 @@ def hourly_update
        puts "Tweet @ #{now}: #{combo}"
        Twitter.update(fortune)
        Twitter.update(combo)
-    end
-
+   end
 end
 
 puts "Loading echoes_bot.rb"
