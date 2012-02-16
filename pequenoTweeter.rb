@@ -10,9 +10,8 @@ require './server.rb'
 gem 'twitter','2.1.0'
 require "twitter"
 
+# Config for twitter gem
 my_config = YAML.load_file('pequenoTweeter.yml')
-puts my_config.inspect
-
 Twitter.configure do |config|
   config.consumer_key = my_config[:consumer_key]
   config.consumer_secret = my_config[:consumer_secret]
@@ -47,8 +46,6 @@ def hourly_update
    end
 end
 
-puts "Loading echoes_bot.rb"
-
 ##
 ## If I wanted to exclude some terms from triggering this bot, I would list them here.
 ## For now, we'll block URLs to keep this from being a source of spam
@@ -58,13 +55,13 @@ exclude "http://"
 blacklist "mean_user, private_user"
 server = Server::Status.new
 
-puts "checking for replies to me since #{since_id}"
+puts "Starting pequenoTweeter. Waiting for replies.."
+
 begin
 loop do
   replies do |tweet|
 
     text = tweet[:text] 
-    puts "Got mention: #{text}"
     case text.downcase! 
        when /address/, /adress/
           answer = "#USER# You'll find me at: #{server.get_address}"
