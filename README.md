@@ -14,3 +14,6 @@ For testing the server.rb file
 * test/tweet.rb
 For quick twitter-tests 
 
+## TODO
+* Remove chatterbot and rely on twitter gem only
+
