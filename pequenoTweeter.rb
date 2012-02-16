@@ -16,29 +16,38 @@ class PequenoTweeter
 
         begin
         loop do
+          shutdown = false
           replies do |tweet|
 
             text = tweet[:text] 
+            puts text
             answer = "#USER# "
             answer << case text.downcase! 
-               when /address/, /adress/ then "You'll find me at: #{@server.get_address}"
-               when /uptime/ then "Been up since #{@server.get_uptime}"
-               when /users/ then "My active users are: #{@server.get_users}"
-               when /boot/ then "My last reboot was #{@server.get_last_boot}"
-               when /top/ then "Top process: #{@server.get_top_process}"
-               when /hemma/ then "Status: #{@server.get_hemma_status}"
-               when /help/ then "Try address, uptime, users, boot, top, hemma or help"
-               else "sh: #{text}: command not found " 
+               when /address/ then "You'll find me at: #{@server.get_address}"
+               when /uptime/  then "Been up since #{@server.get_uptime}"
+               when /users/   then "My active users are: #{@server.get_users}"
+               when /boot/    then "My last reboot was #{@server.get_last_boot}"
+               when /top/     then "Top process: #{@server.get_top_process}"
+               when /hemma/   then "Status: #{@server.get_hemma_status}"
+               when /help/    then "Try address, uptime, users, boot, top, hemma or help"
+               when /#{@shutdown_cmd}/ then "Shutting down!"
+               else "sh: command not found " 
             end
             puts "#{Time.now} : #{answer}"
             # send it back!
             reply answer, tweet
 
+            if text =~ /#{@shutdown_cmd}/ 
+              puts "Exiting!"
+              shutdown = true
+          end
+
           end
           update_config
           check_ip_change
           hourly_update
-          sleep 10
+          sleep 20
+          exit if shutdown==true # After sleep to allow reply to be sent
 
           end
           rescue 
@@ -60,6 +69,7 @@ class PequenoTweeter
         end
 
         @server = Server::Status.new
+        @shutdown_cmd = @my_config[:shutdown_cmd]
     end
 
     def check_ip_change
