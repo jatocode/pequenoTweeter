@@ -8,6 +8,20 @@ module Server
       open("http://myip.se") {|f|f.read.scan(/([0-9]{1,3}\.){3}[0-9]{1,3}/);return $~}
     end
 
+    def get_diskusage_os
+        du = %x[df -h /dev/sda1]
+        if du =~ /(\d+%)/
+            return $1
+        end
+        return "" 
+    end
+
+    def check_for_users
+        u = %x[users]
+        users = u.split
+        users.delete_if { |user| user =~ /tobias/ } 
+    end
+
     def get_users
       #users = `who -q`
       who = %x[who | awk '{print $1,$5}']
@@ -28,7 +42,7 @@ module Server
         if %x[uptime] =~ /.*up\s*(.*)/
             uptime = $1
         end
-        return "..#{ip}, #{get_hemma_status}, #{uptime} "
+        return "..#{ip}, #{get_hemma_status}, #{uptime}, #{get_diskusage_os}, #{check_for_users.size} unknown"
     end
 
     def check_ip
@@ -81,15 +95,17 @@ module Server
 end
 
 public
-def test
-status = Server::Status.new
-puts "Current external IP: #{status.get_address}"
-puts "Active users: #{status.get_users}"
-puts "Last reboot whas: #{status.get_last_boot}"
-puts "Current uptime is: #{status.get_uptime}"
-puts "Top CPU user: #{status.get_top_process}"
-puts "Hemma status: #{status.get_hemma_status}"
-puts "IP check: #{status.check_ip}"
-puts "Combo: #{status.get_combined}"
+    def test
+    status = Server::Status.new
+    puts "Current external IP: #{status.get_address}"
+    puts "Active users: #{status.get_users}"
+    puts "Last reboot whas: #{status.get_last_boot}"
+    puts "Current uptime is: #{status.get_uptime}"
+    puts "Top CPU user: #{status.get_top_process}"
+    puts "Hemma status: #{status.get_hemma_status}"
+    puts "IP check: #{status.check_ip}"
+    puts "Combo: #{status.get_combined}"
+    puts "Disk usage: #{status.get_diskusage_os}"
+    puts "Other users: #{status.check_for_users}"
 end
 
