@@ -8,5 +8,9 @@ Implemented in ruby with the twitter gem and chatterbot gem
 * server.rb
 * pequenoTweeter.yml
 
-
+## Testfiles
+* test/testServer.rb
+For testing the server.rb file
+* test/tweet.rb
+For quick twitter-tests 
 
