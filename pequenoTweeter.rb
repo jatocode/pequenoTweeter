@@ -9,7 +9,6 @@ require "twitter"
 
 class PequenoTweeter
     def start
-        ## For now, we'll block URLs to keep this from being a source of spam
         exclude "http://"
         blacklist "mean_user, private_user"
 
@@ -20,27 +19,18 @@ class PequenoTweeter
           replies do |tweet|
 
             text = tweet[:text] 
-            case text.downcase! 
-               when /address/, /adress/
-                  answer = "#USER# You'll find me at: #{@server.get_address}"
-               when /uptime/
-                  answer = "#USER# Been up since #{@server.get_uptime}"
-               when /users/
-                  answer = "#USER# My active users are: #{@server.get_users}"
-               when /boot/
-                  answer = "#USER# My last reboot was #{@server.get_last_boot}"
-               when /top/
-                  answer = "#USER# Top process: #{@server.get_top_process}"
-               when /hemma/
-                  answer = "#USER# Status: #{@server.get_hemma_status}"
-               when /help/
-                  answer = "#USER# Try address, uptime, users, boot, top, hemma or help"
-               else begin
-                   answer = "#USER# bash: #{text}: command not found "
-                   puts "Unknown command: #{tweet[:text]}"
-               end
+            answer = "#USER# "
+            answer << case text.downcase! 
+               when /address/, /adress/ then "You'll find me at: #{@server.get_address}"
+               when /uptime/ then "Been up since #{@server.get_uptime}"
+               when /users/ then "My active users are: #{@server.get_users}"
+               when /boot/ then "My last reboot was #{@server.get_last_boot}"
+               when /top/ then "Top process: #{@server.get_top_process}"
+               when /hemma/ then "Status: #{@server.get_hemma_status}"
+               when /help/ then "Try address, uptime, users, boot, top, hemma or help"
+               else "sh: #{text}: command not found " 
             end
-            puts answer
+            puts "#{Time.now} : #{answer}"
             # send it back!
             reply answer, tweet
 
@@ -52,7 +42,7 @@ class PequenoTweeter
 
           end
           rescue 
-            puts "Something went haywire. Retrying. #{$!}"
+            puts "Something went wrong. Retrying. #{$!}"
             retry
         end
     end
@@ -80,7 +70,6 @@ class PequenoTweeter
     end
 
     def hourly_update
-
        base_path = @my_config[:base_path]
        last_tweet = File.open("#{base_path}/last_tweet") {|f| f.readline}
        last_update = Time.at(last_tweet.to_i)
