@@ -20,22 +20,23 @@ class PequenoTweeter
           replies do |tweet|
 
             text = tweet[:text] 
-            puts text
-            answer = "#USER# "
-            answer << case text.downcase! 
+            puts "#{tweet[:user][:name]}: #{text}"
+
+            answer = case text.downcase! 
                when /address/ then "You'll find me at: #{@server.get_address}"
                when /uptime/  then "Been up since #{@server.get_uptime}"
                when /users/   then "My active users are: #{@server.get_users}"
                when /boot/    then "My last reboot was #{@server.get_last_boot}"
                when /top/     then "Top process: #{@server.get_top_process}"
                when /hemma/   then "Status: #{@server.get_hemma_status}"
-               when /help/    then "Try address, uptime, users, boot, top, hemma or help"
                when /#{@shutdown_cmd}/ then "Shutting down!"
-               else "sh: command not found " 
+               else "" 
             end
-            puts "#{Time.now} : #{answer}"
-            # send it back!
-            reply answer, tweet
+            unless answer == "" 
+                puts "#{Time.now} : #{answer}"
+                # send it back!
+                reply "#USER# #{answer}", tweet
+            end
 
             if text =~ /#{@shutdown_cmd}/ 
               puts "Exiting!"
