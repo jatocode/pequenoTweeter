@@ -5,7 +5,7 @@ require 'open-uri'
 module Server
   class Status
     def get_address
-      open("http://myip.se") {|f|f.read.scan(/([0-9]{1,3}\.){3}[0-9]{1,3}/);return $~}
+      open("http://checkip.dyndns.com") {|f|f.read.scan(/([0-9]{1,3}\.){3}[0-9]{1,3}/);return $~}
     end
 
     def get_diskusage_os

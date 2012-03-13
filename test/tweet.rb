@@ -7,8 +7,7 @@ require "./server.rb"
 puts "Testing..."
 #puts Twitter.user_timeline("tobbe_j").first.text
 
-my_config = YAML.load_file('global.yml')
-puts my_config.inspect
+my_config = YAML.load_file('test/test-config.yml')
 
 Twitter.configure do |config|
   config.consumer_key = my_config[:consumer_key]
@@ -26,12 +25,7 @@ end
 server = Server::Status.new
 ip = server.get_address
 #Twitter.update("My IP seems to be: #{ip}")
-#Twitter.update("I have some users active: #{server.get_users}")
-#Twitter.update("My latest reboot was: #{server.get_last_boot} and my uptime is #{server.get_uptime}")
-s=""
-test = (0x2581..0x2589).to_a
-s = test.pack("U*")
-puts s
-#Twitter.update("Unicode? #{s}")
 
+puts "(#{Time.now}) Tweeting: \"#{ARGV[0]}\""
+Twitter.update(ARGV[0])
 puts Twitter.rate_limit_status.remaining_hits.to_s + " Twitter API request(s) remaining this hour"
