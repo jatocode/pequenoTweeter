@@ -2,7 +2,7 @@
 require 'rubygems'
 require 'chatterbot/dsl'
 require './server.rb'
-gem 'twitter','2.1.0' # Since I'm mixing chatterbot and twitter I need to do this
+#gem 'twitter','2.1.0' # Since I'm mixing chatterbot and twitter I need to do this
 require "twitter"
 
 # PequenoTweeter 
@@ -19,6 +19,8 @@ class PequenoTweeter
           shutdown = false
           replies do |tweet|
 
+             puts "Looping..."
+
             text = tweet[:text] 
             puts "#{tweet[:user][:name]}: #{text}"
 
@@ -29,6 +31,7 @@ class PequenoTweeter
                when /boot/    then "My last reboot was #{@server.get_last_boot}"
                when /top/     then "Top process: #{@server.get_top_process}"
                when /hemma/   then "Status: #{@server.get_hemma_status}"
+               when /ping/    then "Pong!"
                when /#{@shutdown_cmd}/ then "Shutting down!"
                else "" 
             end
@@ -51,8 +54,13 @@ class PequenoTweeter
           exit if shutdown==true # After sleep to allow reply to be sent
 
           end
-          rescue 
+          rescue Twitter::Error::TooManyRequests => error
+            puts "Rate limit exceeded: #{error}, sleeping for #{error.rate_limit.reset_in}"
+            sleep error.rate_limit.reset_in
+            retry
+          rescue
             puts "Something went wrong. Retrying. #{$!}"
+            sleep 30
             retry
         end
     end
@@ -76,7 +84,7 @@ class PequenoTweeter
     def check_ip_change
         ip = @server.check_ip
         unless ip =~ /No/
-            Twitter.direct_message_create("tobbe_j", ip)
+            Twitter.direct_message_create("datakille", ip)
         end
     end
 
