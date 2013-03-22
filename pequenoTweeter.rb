@@ -4,6 +4,9 @@ require 'chatterbot/dsl'
 require './server.rb'
 #gem 'twitter','2.1.0' # Since I'm mixing chatterbot and twitter I need to do this
 require "twitter"
+require 'faraday'
+require 'typhoeus'
+require 'typhoeus/adapters/faraday'
 
 # PequenoTweeter 
 
@@ -47,7 +50,7 @@ class PequenoTweeter
           end
 
           end
-          update_config
+          # update_config
           check_ip_change
           hourly_update
           sleep 20
@@ -60,7 +63,7 @@ class PequenoTweeter
             retry
           rescue
             puts "Something went wrong. Retrying. #{$!}"
-            sleep 30
+            sleep 3
             retry
         end
     end
@@ -68,6 +71,20 @@ class PequenoTweeter
     def initialize
         # Load config
         @my_config = YAML.load_file('pequenoTweeter.yml')
+
+
+# I had to add this to resolve an "end of filei reached" problem 
+        middleware = Proc.new do |builder|
+            builder.use Twitter::Request::MultipartWithFile
+            builder.use Faraday::Request::Multipart
+            builder.use Faraday::Request::UrlEncoded
+            builder.use Twitter::Response::RaiseError, Twitter::Error::ClientError
+            builder.use Twitter::Response::ParseJson
+            builder.use Twitter::Response::RaiseError, Twitter::Error::ServerError
+            builder.adapter :typhoeus
+        end
+
+        Twitter.middleware = Faraday::Builder.new(&middleware)
 
         # Configure twitter gem
         Twitter.configure do |config|
