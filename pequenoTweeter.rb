@@ -20,7 +20,10 @@ class PequenoTweeter
         begin
         loop do
           shutdown = false
+          puts "Checking for replies"
           replies do |tweet|
+
+            puts "Found #{replies.length} replies"
 
             text = tweet[:text] 
             puts "#{tweet[:user][:name]}: #{text}"
@@ -51,7 +54,7 @@ class PequenoTweeter
           update_config # I can't remember why I need to do this?
           check_ip_change
           hourly_update
-          sleep 20
+          sleep 61
           exit if shutdown==true # After sleep to allow reply to be sent
 
           end
