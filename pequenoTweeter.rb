@@ -22,8 +22,6 @@ class PequenoTweeter
           shutdown = false
           replies do |tweet|
 
-             puts "Looping..."
-
             text = tweet[:text] 
             puts "#{tweet[:user][:name]}: #{text}"
 
@@ -50,7 +48,7 @@ class PequenoTweeter
           end
 
           end
-          # update_config
+          update_config # I can't remember why I need to do this?
           check_ip_change
           hourly_update
           sleep 20
