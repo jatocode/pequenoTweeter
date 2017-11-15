@@ -20,7 +20,6 @@ class PequenoTweeter
         begin
         loop do
           shutdown = false
-          puts "Checking for replies"
           replies do |tweet|
 
             puts "Found #{replies.length} replies"
@@ -58,10 +57,10 @@ class PequenoTweeter
           exit if shutdown==true # After sleep to allow reply to be sent
 
           end
-          rescue Twitter::Error::TooManyRequests => error
-            puts "Rate limit exceeded: #{error}, sleeping for #{error.rate_limit.reset_in}"
-            sleep error.rate_limit.reset_in
-            retry
+          #rescue Twitter::Error::TooManyRequests => error
+          #  puts "Rate limit exceeded: #{error}, sleeping for #{error.rate_limit.reset_in}"
+          #  sleep error.rate_limit.reset_in
+          #  retry
           rescue
             puts "Something went wrong. Retrying. #{$!}"
             sleep 3
@@ -85,7 +84,7 @@ class PequenoTweeter
             builder.adapter :typhoeus
         end
 
-        Twitter.middleware = Faraday::Builder.new(&middleware)
+#        Twitter.middleware = Faraday::Builder.new(&middleware)
 
         # Configure twitter gem
         Twitter.configure do |config|
