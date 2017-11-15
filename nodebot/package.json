@@ -1,0 +1,17 @@
+{
+  "name": "pequenobot",
+  "version": "0.0.1",
+  "description": "bot for pequeno",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tobias",
+  "license": "ISC",
+  "dependencies": {
+    "ip": "^1.1.5",
+    "node-ip": "^0.1.2",
+    "qrcode-terminal": "^0.11.0",
+    "twit": "^2.2.9"
+  }
+}
