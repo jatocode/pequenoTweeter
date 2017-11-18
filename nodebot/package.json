@@ -13,6 +13,7 @@
     "node-fetch": "^1.7.3",
     "node-ip": "^0.1.2",
     "number-to-words": "^1.2.3",
+    "qrcode-npm": "0.0.3",
     "qrcode-terminal": "^0.11.0",
     "twit": "^2.2.9"
   }
