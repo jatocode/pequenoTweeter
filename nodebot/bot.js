@@ -4,6 +4,7 @@ const http = require('http');
 const fetch = require('node-fetch');
 const towords = require('number-to-words');
 const qrcode = require('qrcode-npm');
+const wikifakt = require('wikifakt');
 
 const Twitter = new twit(config);
 var externalIp = '';
@@ -13,6 +14,7 @@ postInfo();
 setInterval(postInfo, 4 * 60 * 60 * 1000);
 
 function dmTo(user, data) {
+      console.log('Skickar DM om ny extern IP');
       var request = { 'event': { 
           'type': 'message_create',
           'message_create': {
@@ -21,7 +23,6 @@ function dmTo(user, data) {
           }
         } 
       };
-      console.log(JSON.stringify(request));
       Twitter.post('direct_messages/events/new', request, 
             function (err, data, response) {
                 if(err) {
@@ -35,8 +36,8 @@ function dmTo(user, data) {
 function postInfo() {
       console.log('Posting to twitter ' + Date.now());
       getExternalIP().then((ip) => {
-            console.log(ip);
-            if(ip != externalIp) {
+            console.log(`Min externa IP är just nu ${ip} och den sparade är ${externalIp}`);
+            if(externalIp.length > 0 && ip != externalIp) {
                   dmTo('167767078', 'Jag har en ny ip-address verkar det som: ' + ip);
             }
             externalIp = ip;
@@ -45,9 +46,14 @@ function postInfo() {
             a.forEach(function (e) {
                   ipwords += towords.toWords(e) + '.';
             });
-            console.log(ipwords);
 
-            //post(ip);
+            wikifakt.getRandomFact().then((fact) => {
+                var tweet = ip.replace(/\./g, '-') + '\n' + fact;
+                console.log('Postar IP och random wikifakta');
+                post(tweet.substring(0, 279));
+            });
+
+          /*
             const b64content = generateCode(ip);
             Twitter.post('media/upload', { media_data: b64content }, function (err, data, response) {
                   // now we can assign alt text to the media, for use by screen readers and
@@ -70,11 +76,12 @@ function postInfo() {
                         }
                   })
             })
+            */
 
       });
 
       getUptime().then((uptime) => {
-           console.log(uptime);
+           console.log('Postar status om uptime');
            post(uptime);
       });
 
@@ -93,11 +100,10 @@ function generateCode(data) {
 }
 
 function post(message) {
-      Twitter.post('statuses/update ', { status: message }, function (err, data, response) {
-            if(!err) {
-                  console.log('Posted ok: ' + data)
-            } else {
-                  console.log('Error when posting:' + message);
+      Twitter.post('statuses/update', { status: message }, function (err, data, response) {
+            if(err) {
+                console.log('Error when posting:' + message);
+                console.log(JSON.stringify(err));
             }
       })
 }
