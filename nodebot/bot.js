@@ -10,12 +10,24 @@ var externalIp = '';
 
 // Start checking server status 
 postInfo();
-setInterval(postInfo, 3600 * 1000);
+setInterval(postInfo, 4 * 60 * 60 * 1000);
 
-function dmToTobias(data) {
-      Twitter.post('direct_messages/new', { user: 'datakille', text: data }, 
+function dmTo(user, data) {
+      var request = { 'event': { 
+          'type': 'message_create',
+          'message_create': {
+              'target' : { 'recipient_id': user },
+              'message_data' : { 'text': data }
+          }
+        } 
+      };
+      console.log(JSON.stringify(request));
+      Twitter.post('direct_messages/events/new', request, 
             function (err, data, response) {
-                  // console.log(data)
+                if(err) {
+                  console.log('DM failed');
+                  console.log(err);
+                }
             }
       );
 }
@@ -25,7 +37,7 @@ function postInfo() {
       getExternalIP().then((ip) => {
             console.log(ip);
             if(ip != externalIp) {
-                  dmToTobias('Jag har en ny ip-address verkar det som: ' + ip);
+                  dmTo('167767078', 'Jag har en ny ip-address verkar det som: ' + ip);
             }
             externalIp = ip;
             const a = ip.split('.');
@@ -62,8 +74,8 @@ function postInfo() {
       });
 
       getUptime().then((uptime) => {
-            console.log(uptime);
-            post(uptime);
+           console.log(uptime);
+           post(uptime);
       });
 
 }
@@ -82,7 +94,11 @@ function generateCode(data) {
 
 function post(message) {
       Twitter.post('statuses/update ', { status: message }, function (err, data, response) {
-            console.log(data)
+            if(!err) {
+                  console.log('Posted ok: ' + data)
+            } else {
+                  console.log('Error when posting:' + message);
+            }
       })
 }
 
